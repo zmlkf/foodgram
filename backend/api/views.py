@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Sum
 from django.db.utils import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -199,13 +200,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         Generate and download shopping cart as a text file.
         """
         shopping_cart = IngredientAmount.objects.filter(
-            recipe__cart_items__user=request.user)
-        shopping_list = {}
-        for item in shopping_cart:
-            key = (item.ingredient, item.ingredient.measurement_unit)
-            shopping_list[key] = (shopping_list.get(key, 0) + item.amount)
-        content = '\n'.join((f'- {key[0]} ({key[1]}) — {value}'
-                             for key, value in shopping_list.items()))
+            recipe__cart_items__user=request.user
+        ).values(
+            'ingredient__name', 'ingredient__measurement_unit'
+        ).annotate(ingredient_total=Sum('amount'))
+        content = '\n'.join(((f'- {item.get("ingredient__name")} '
+                              f'({item.get("ingredient__measurement_unit")}) '
+                              f'— {item.get("ingredient_total")}')
+                            for item in shopping_cart))
         response = HttpResponse(
             content, content_type='text/plain,charset=utf8'
         )
