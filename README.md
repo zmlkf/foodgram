@@ -24,11 +24,15 @@ WSGI (Web Server Gateway Interface) сервер для Python веб-прило
 
 ## Проект достпун по адресу [https://foodgramm-zmlkf.ddns.net/](https://foodgramm-zmlkf.ddns.net/)
 Логин и пароль администратора
+
 zmlkf@gmail.com
+
 zmlkfpassword
 
 Логин и пароль обычного пользователя
+
 petrovich@omail.ru
+
 parolparol
 ## Автор
 Roman Zemliakov [GitHub](https://github.com/zmlkf)
