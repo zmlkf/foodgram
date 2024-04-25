@@ -9,13 +9,13 @@ from rest_framework import (decorators, exceptions, permissions, status,
                             viewsets)
 from rest_framework.response import Response
 
-from recipes.models import (Favorite, Follow, Ingredient, IngredientAmount,
-                            Recipe, ShoppingCart, Tag)
 from .filters import IngredientFilter, RecipeFilter
 from .permissions import IsAuthorOrAdminOrReadOnly
 from .serializers import (FollowSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeSerializer,
                           SimpleRecipeSerializer, TagSerializer)
+from recipes.models import (Favorite, Follow, Ingredient, IngredientAmount,
+                            Recipe, ShoppingCart, Tag)
 
 User = get_user_model()
 
