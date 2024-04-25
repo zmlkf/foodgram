@@ -1,5 +1,3 @@
-"""python manage.py import_ingredients 'data/ingredients.csv'"""
-
 import csv
 
 from django.core.management.base import BaseCommand
@@ -9,11 +7,13 @@ from recipes.models import Ingredient
 
 def import_ingredients_from_csv(csv_file):
     """
-    Функция для импорта данных из CSV файла
-    в базу данных для модели Ingredient.
+    Function to import data from a CSV file
+    into the database for the Ingredient model.
 
-    Аргументы:
-    csv_file (str): Путь к CSV файлу.
+    Arguments:
+      csv_file (str): Path to the CSV file.
+    Usage:
+      python manage.py import_ingredients 'data/ingredients.csv
     """
     with open(csv_file, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
@@ -24,9 +24,9 @@ def import_ingredients_from_csv(csv_file):
                     name=name, measurement_unit=measurement_unit).exists():
                 Ingredient.objects.create(
                     name=name, measurement_unit=measurement_unit)
-                print(f'Ингредиент "{name}" успешно добавлен.')
+                print(f'Ingredient "{name}" successfully added.')
             else:
-                print(f'Ингредиент "{name}" уже существует в базе данных.')
+                print(f'Ingredient "{name}" already exists in the database.')
 
 
 class Command(BaseCommand):
