@@ -1,5 +1,5 @@
 # FoodGram - коллекция кулинарных рецептов
-[![Main FoodGram workflow](https://github.com/zmlkf/foodgram-project-react/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/zmlkf/foodgram-project-react/actions/workflows/main.yml)
+[![Main FoodGram workflow](https://github.com/zmlkf/foodgram-project-react/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/zmlkf/foodgram-project-react/actions/workflows/main.yml)
 
 ## Описание
 FoodGram - это продуктовый помощник, хранящий в себе коллекцию рецептов, позволяющий всем пользователям просмативать рецепты блюд. А для тех, кто зарегистрирован, появляется возможность публиковать свои собсвенные рецепты, подписываться на других авторов этой платформы, добавлять любые рецепты в избранное и в корзину(из которой потом, нажатием одной кнопки, можно будет получить список всех необходимых ингредиентов). 
