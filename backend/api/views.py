@@ -190,20 +190,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 model_class.__class__.__name__))
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @decorators.action(
-        detail=False,
-        methods=('get',),
-        permission_classes=(permissions.IsAuthenticated,)
-    )
-    def download_shopping_cart(self, request):
+    def download_file_response(self, shopping_cart):
         """
-        Generate and download shopping cart as a text file.
+        Generate HTTP response for downloading a text file.
         """
-        shopping_cart = IngredientAmount.objects.filter(
-            recipe__cart_items__user=request.user
-        ).values(
-            'ingredient__name', 'ingredient__measurement_unit'
-        ).annotate(ingredient_total=Sum('amount'))
         content = '\n'.join(((f'- {item.get("ingredient__name")} '
                               f'({item.get("ingredient__measurement_unit")}) '
                               f'— {item.get("ingredient_total")}')
@@ -214,3 +204,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = ('attachment; '
                                            'filename="shopping_cart.txt"')
         return response
+
+    @decorators.action(
+        detail=False,
+        methods=('get',),
+        permission_classes=(permissions.IsAuthenticated,)
+    )
+    def download_shopping_cart(self, request):
+        """
+        Generate shopping cart.
+        """
+        return self.download_file_response(IngredientAmount.objects.filter(
+            recipe__cart_items__user=request.user
+        ).values(
+            'ingredient__name', 'ingredient__measurement_unit'
+        ).annotate(ingredient_total=Sum('amount')))
