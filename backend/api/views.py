@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum
-from django.db.utils import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -10,23 +9,20 @@ from rest_framework import (decorators, exceptions, permissions, status,
                             viewsets)
 from rest_framework.response import Response
 
+from . import constants
 from .filters import IngredientFilter, RecipeFilter
 from .permissions import IsAuthorOrAdminOrReadOnly
-from .serializers import (FollowSerializer, IngredientSerializer,
+from .serializers import (FavoriteSerializer, FollowCreateSerializer,
+                          FollowSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeSerializer,
-                          SimpleRecipeSerializer, TagSerializer)
+                          ShoppingCartSerializer, TagSerializer)
 from recipes.models import (Favorite, Follow, Ingredient, IngredientAmount,
                             Recipe, ShoppingCart, Tag)
 
 User = get_user_model()
 
-RECIPE_ALREADY_IN_LIST = 'Recipe already added to {}'
-RECIPE_DOES_NOT_EXIST = 'Recipe with ID {} does not exist in the database'
-ERROR_DELETE_SUBSCRIPTION = 'Subscription does not exist'
-RECIPE_NOT_IN_LIST = 'Recipe was not added to {}'
 
-
-class CustomUserViewSet(UserViewSet):
+class UserViewSet(UserViewSet):
     """
     Custom user view set with additional actions.
     """
@@ -57,18 +53,18 @@ class CustomUserViewSet(UserViewSet):
         user = request.user
         author = get_object_or_404(User, pk=self.kwargs.get('id'))
         if request.method == 'POST':
-            serializer = FollowSerializer(
-                author,
-                data=request.data,
+            serializer = FollowCreateSerializer(
+                data={'user': user.id, 'author': author.id},
                 context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
-            Follow.objects.create(user=user, author=author)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         try:
             Follow.objects.get(user=user, author=author).delete()
         except ObjectDoesNotExist:
-            raise exceptions.ValidationError(ERROR_DELETE_SUBSCRIPTION)
+            raise exceptions.ValidationError(
+                constants.ERROR_DELETE_SUBSCRIPTION)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @decorators.action(
@@ -93,6 +89,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """
     View set for tags.
     """
+
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
@@ -102,6 +99,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     """
     View set for ingredients.
     """
+
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend,)
@@ -113,18 +111,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """
     View set for recipes.
     """
+
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     permission_classes = (IsAuthorOrAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     http_method_names = ('get', 'post', 'delete', 'patch')
-
-    def perform_create(self, serializer):
-        """
-        Assign current user as the author when creating a recipe.
-        """
-        serializer.save(author=self.request.user)
 
     def get_serializer_class(self):
         """
@@ -144,7 +137,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         Add or remove a recipe from favorites.
         """
         if request.method == 'POST':
-            return self.add_to_list(Favorite, request.user, pk)
+            return self.add_to_list(
+                Favorite, FavoriteSerializer, request.user, pk)
         return self.remove_from_list(Favorite, request.user, pk)
 
     @decorators.action(
@@ -157,24 +151,27 @@ class RecipeViewSet(viewsets.ModelViewSet):
         Add or remove a recipe from shopping cart.
         """
         if request.method == 'POST':
-            return self.add_to_list(ShoppingCart, request.user, pk)
+            return self.add_to_list(
+                ShoppingCart, ShoppingCartSerializer, request.user, pk)
         return self.remove_from_list(ShoppingCart, request.user, pk)
 
-    def add_to_list(self, model_class, user, pk):
+    def add_to_list(self, model_class, serializer, user, pk):
         """
         Add recipe to the specified list.
         """
         try:
             recipe = Recipe.objects.get(pk=pk)
-            model_class.objects.create(user=user, recipe=recipe)
         except ObjectDoesNotExist:
-            raise exceptions.ValidationError(RECIPE_DOES_NOT_EXIST.format(pk))
-        except IntegrityError:
-            raise exceptions.ValidationError(RECIPE_ALREADY_IN_LIST.format(
-                model_class.__class__.__name__))
-        return Response(
-            SimpleRecipeSerializer(recipe).data, status=status.HTTP_201_CREATED
-        )
+            raise exceptions.ValidationError(
+                constants.RECIPE_DOES_NOT_EXIST.format(pk))
+        if model_class.objects.filter(user=user, recipe=recipe).exists():
+            raise exceptions.ValidationError(
+                constants.RECIPE_ALREADY_IN_LIST.format(
+                    model_class.__class__.__name__))
+        serializer = serializer(data={'user': user.id, 'recipe': recipe.id})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def remove_from_list(self, model_class, user, pk):
         """
@@ -182,12 +179,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """
         try:
             model_class.objects.get(
-                user=user,
-                recipe=get_object_or_404(Recipe, pk=pk)
+                user=user, recipe=get_object_or_404(Recipe, pk=pk)
             ).delete()
         except ObjectDoesNotExist:
-            raise exceptions.ValidationError(RECIPE_NOT_IN_LIST.format(
-                model_class.__class__.__name__))
+            raise exceptions.ValidationError(
+                constants.RECIPE_NOT_IN_LIST.format(
+                    model_class.__class__.__name__))
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def download_file_response(self, shopping_cart):
