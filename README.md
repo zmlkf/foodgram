@@ -26,7 +26,7 @@ WSGI (Web Server Gateway Interface) сервер для Python веб-прило
 1. Клонировать репозиторий:
 
 ```bash
-git clone https://github.com/zmlkf/foodgram-project-react
+git clone https://github.com/zmlkf/foodgram-project-react 
 ```
 2. Перейти в директорию проекта
 ```bash
