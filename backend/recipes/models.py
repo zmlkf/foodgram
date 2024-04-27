@@ -147,7 +147,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('-pub_date',)
         default_related_name = 'recipes'
         verbose_name = constants.RECIPE
         verbose_name_plural = constants.RECIPES
