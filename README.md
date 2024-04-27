@@ -53,17 +53,7 @@ sudo docker compose -f docker-compose.yml exec backend cp -r /app/collected_stat
 ```
 
 ## Проект достпун по адресу [https://foodgramm-zmlkf.ddns.net/](https://foodgramm-zmlkf.ddns.net/)
-Логин и пароль администратора
 
-- zmlkf@gmail.com
-
-- zmlkfpassword
-
-Логин и пароль обычного пользователя
-
-- petrovich@omail.ru
-
-- parolparol
 
 ## Документация доступна по адресу  [https://foodgramm-zmlkf.ddns.net/api/docs/redoc.html](https://foodgramm-zmlkf.ddns.net/api/docs/redoc.html)
 

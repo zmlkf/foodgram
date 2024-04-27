@@ -5,6 +5,7 @@ from django.db import models
 
 from . import constants
 from .utils import generate_random_color
+from .validators import validate_username
 
 
 class User(AbstractUser):
@@ -14,6 +15,13 @@ class User(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
+    username = models.CharField(
+        constants.USERNAME,
+        max_length=constants.MAX_LENGTH_USERNAME,
+        help_text=(constants.USERNAME_HELP_TEXT),
+        unique=True,
+        validators=(validate_username,),
+    )
     email = models.EmailField(
         constants.EMAIL_ADDRESS,
         max_length=constants.EMAIL_LENGTH,
@@ -171,7 +179,7 @@ class IngredientAmount(models.Model):
         on_delete=models.CASCADE,
         verbose_name=constants.RECIPE
     )
-    amount = models.IntegerField(
+    amount = models.PositiveIntegerField(
         constants.INGREDIENT_AMOUNT,
         validators=(MinValueValidator(
             constants.MIN_INGREDIENT_AMOUNT,
@@ -181,6 +189,8 @@ class IngredientAmount(models.Model):
     )
 
     class Meta:
+        verbose_name = constants.INGREDIENT_AMOUNT
+        verbose_name_plural = constants.INGREDIENT_AMOUNTS
         default_related_name = 'ingredient_amounts'
         constraints = (
             models.UniqueConstraint(
@@ -212,6 +222,8 @@ class Favorite(models.Model):
     )
 
     class Meta:
+        verbose_name = constants.FAVORITE
+        verbose_name_plural = constants.FAVORITES
         default_related_name = 'favorites'
         constraints = (
             models.UniqueConstraint(
@@ -244,6 +256,8 @@ class ShoppingCart(models.Model):
     )
 
     class Meta:
+        verbose_name = constants.SHOPPING_CART
+        verbose_name_plural = constants.SHOPPING_CARTS
         default_related_name = 'cart_items'
         constraints = (
             models.UniqueConstraint(
@@ -277,6 +291,8 @@ class Follow(models.Model):
     )
 
     class Meta:
+        verbose_name = constants.SUBSCRIPTION
+        verbose_name_plural = constants.SUBSCRIPTIONS
         constraints = (
             models.UniqueConstraint(
                 fields=('user', 'author'), name=constants.ALREADY_FOLLOW),

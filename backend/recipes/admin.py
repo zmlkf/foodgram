@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
+from . import constants
 from .models import (Favorite, Follow, Ingredient, IngredientAmount, Recipe,
                      ShoppingCart, Tag, User)
 
@@ -8,18 +9,29 @@ from .models import (Favorite, Follow, Ingredient, IngredientAmount, Recipe,
 class TagInline(admin.TabularInline):
     model = Recipe.tags.through
     extra = 1
+    min_num = constants.MIN_TAG_AMOUNT
 
 
 class IngredientAmountInline(admin.TabularInline):
     model = IngredientAmount
     extra = 1
+    min_num = constants.MIN_INGREDIENT_AMOUNT
 
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ('email', 'username', 'first_name', 'last_name')
+    list_display = ('email', 'username', 'first_name',
+                    'last_name', 'recipe_count', 'follower_count')
     list_filter = ('email', 'username')
     search_fields = ('email', 'username')
+
+    @admin.display(description='Recipes')
+    def recipe_count(self, obj):
+        return obj.recipes.count()
+
+    @admin.display(description='Followers')
+    def follower_count(self, obj):
+        return obj.follower.count()
 
 
 @admin.register(Tag)

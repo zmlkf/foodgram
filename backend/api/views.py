@@ -137,8 +137,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         Add or remove a recipe from favorites.
         """
         if request.method == 'POST':
-            return self.add_to_list(
-                Favorite, FavoriteSerializer, request.user, pk)
+            return self.add_to_list(FavoriteSerializer, request.user, pk)
         return self.remove_from_list(Favorite, request.user, pk)
 
     @decorators.action(
@@ -151,11 +150,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         Add or remove a recipe from shopping cart.
         """
         if request.method == 'POST':
-            return self.add_to_list(
-                ShoppingCart, ShoppingCartSerializer, request.user, pk)
+            return self.add_to_list(ShoppingCartSerializer, request.user, pk)
         return self.remove_from_list(ShoppingCart, request.user, pk)
 
-    def add_to_list(self, model_class, serializer, user, pk):
+    def add_to_list(self, serializer, user, pk):
         """
         Add recipe to the specified list.
         """
@@ -164,10 +162,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         except ObjectDoesNotExist:
             raise exceptions.ValidationError(
                 constants.RECIPE_DOES_NOT_EXIST.format(pk))
-        if model_class.objects.filter(user=user, recipe=recipe).exists():
-            raise exceptions.ValidationError(
-                constants.RECIPE_ALREADY_IN_LIST.format(
-                    model_class.__class__.__name__))
         serializer = serializer(data={'user': user.id, 'recipe': recipe.id})
         serializer.is_valid(raise_exception=True)
         serializer.save()

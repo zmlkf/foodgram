@@ -315,7 +315,15 @@ class FavoriteSerializer(ModelSerializer):
 
     class Meta:
         model = Favorite
-        fields = '__all__'
+        fields = ('user', 'recipe')
+
+    def validate(self, data):
+        if self.Meta.model.objects.filter(
+            user=data.get('user'), recipe=data.get('recipe')
+        ).exists():
+            raise ValidationError(constants.RECIPE_ALREADY_IN_LIST.format(
+                self.Meta.model._meta.verbose_name))
+        return super().validate(data)
 
     def to_representation(self, instance):
         return SimpleRecipeSerializer(instance.recipe).data

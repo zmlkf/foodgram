@@ -8,13 +8,20 @@ from recipes.models import Ingredient
 
 def import_ingredients_from_csv(csv_file):
     """
-    Function to import data from a CSV file
-    into the database for the Ingredient model.
+    Import data from a CSV file into the database for the Ingredient model.
 
-    Arguments:
-      csv_file (str): Path to the CSV file.
+    Args:
+        csv_file (str): Path to the CSV file containing ingredient data.
+
+    Raises:
+        FileNotFoundError: If the specified CSV file does not exist.
+        PermissionError: If the specified CSV file cannot be read due
+        to lack of permissions.
+        ValueError: If the CSV file is empty or has invalid format.
+
     Usage:
-      python manage.py import_ingredients data/ingredients.csv
+        This function can be called from the command line using:
+        python manage.py import_ingredients data/ingredients.csv
     """
     with open(csv_file, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
