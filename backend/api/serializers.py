@@ -5,8 +5,9 @@ from rest_framework.serializers import (IntegerField, ModelSerializer,
                                         SerializerMethodField, ValidationError)
 
 from . import constants, fields
-from recipes.models import (ALREADY_FOLLOW, Favorite, Follow, Ingredient,
-                            IngredientAmount, Recipe, ShoppingCart, Tag)
+from recipes.constants import ALREADY_FOLLOW
+from recipes.models import (Favorite, Follow, Ingredient, IngredientAmount,
+                            Recipe, ShoppingCart, Tag)
 
 User = get_user_model()
 

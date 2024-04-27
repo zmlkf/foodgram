@@ -1,11 +1,22 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .models import (Favorite, Follow, Ingredient, IngredientAmount, Recipe,
                      ShoppingCart, Tag, User)
 
 
+class TagInline(admin.TabularInline):
+    model = Recipe.tags.through
+    extra = 1
+
+
+class IngredientAmountInline(admin.TabularInline):
+    model = IngredientAmount
+    extra = 1
+
+
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(BaseUserAdmin):
     list_display = ('email', 'username', 'first_name', 'last_name')
     list_filter = ('email', 'username')
     search_fields = ('email', 'username')
@@ -27,13 +38,14 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
+    inlines = (IngredientAmountInline, TagInline)
     list_display = ('name', 'author', 'favorite_count')
     list_filter = ('author', 'name', 'tags__name')
     search_fields = ('name', 'author__username')
 
+    @admin.display(description='Favorites')
     def favorite_count(self, obj):
         return obj.favorites.count()
-    favorite_count.short_description = 'Favorites'
 
 
 @admin.register(IngredientAmount)

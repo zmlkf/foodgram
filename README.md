@@ -22,6 +22,36 @@ WSGI (Web Server Gateway Interface) сервер для Python веб-прило
 6. GitHub Actions
 Сервис автоматизации задач на основе событий, предоставляемый GitHub. GitHub Actions позволяет создавать и настраивать рабочие процессы для вашего репозитория на GitHub, такие как тестирование, сборка, развертывание и многие другие операции, которые могут быть выполнены автоматически при определенных событиях в репозитории.
 
+## Развернуть проект локально
+1. Клонировать репозиторий:
+
+```bash
+git clone https://github.com/zmlkf/foodgram-project-react
+```
+2. Перейти в директорию проекта
+```bash
+cd foodgram-project-react
+```
+3. Создать файл .env и прописать в нем константы
+```bash
+POSTGRES_DB= - имя базы данных
+POSTGRES_USER= - имя пользователя
+POSTGRES_PASSWORD= - пароль
+DEBUG='True'
+```
+4. Выпольнить последовательно команды
+```bash
+sudo docker compose -f docker-compose.yml up -d
+sudo docker compose -f docker-compose.yml exec backend python manage.py migrate
+sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic
+sudo docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. /static/static/
+```
+5. Проект и документация станут доступны по
+```bash
+[http://localhost/](http://localhost/)
+[http://localhost/api/docs/](http://localhost/api/docs/)
+```
+
 ## Проект достпун по адресу [https://foodgramm-zmlkf.ddns.net/](https://foodgramm-zmlkf.ddns.net/)
 Логин и пароль администратора
 
@@ -34,5 +64,11 @@ WSGI (Web Server Gateway Interface) сервер для Python веб-прило
 - petrovich@omail.ru
 
 - parolparol
+
+## Документация доступна по адресу  [https://foodgramm-zmlkf.ddns.net/api/docs/redoc.html](https://foodgramm-zmlkf.ddns.net/api/docs/redoc.html)
+
+
+
+
 ## Автор
 Roman Zemliakov [GitHub](https://github.com/zmlkf)

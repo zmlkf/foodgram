@@ -1,8 +1,8 @@
 # flake8: noqa
 import os
-from django.core.management.utils import get_random_secret_key
 from pathlib import Path
 
+from django.core.management.utils import get_random_secret_key
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'django_filters',
+    'colorfield',
     'api.apps.ApiConfig',
     'recipes.apps.RecipesConfig',
 ]
