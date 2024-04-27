@@ -31,7 +31,7 @@ class UserAdmin(BaseUserAdmin):
 
     @admin.display(description='Followers')
     def follower_count(self, obj):
-        return obj.follower.count()
+        return obj.following.count()
 
 
 @admin.register(Tag)
