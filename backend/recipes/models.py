@@ -201,7 +201,7 @@ class IngredientAmount(models.Model):
         )
 
     def __str__(self):
-        return (f'{self.ingredient.name[:constants.TEXT_LENGTH]}: '
+        return (f'{self.ingredient}: '
                 f'{self.amount} {self.ingredient.measurement_unit}')
 
 
@@ -233,10 +233,7 @@ class Favorite(models.Model):
         )
 
     def __str__(self):
-        return constants.RECIPE_IN_SHOPPING_CART.format(
-            self.recipe[:constants.TEXT_LENGTH],
-            self.user[:constants.TEXT_LENGTH]
-        )
+        return constants.RECIPE_IN_SHOPPING_CART.format(self.recipe, self.user)
 
 
 class ShoppingCart(models.Model):
@@ -266,10 +263,7 @@ class ShoppingCart(models.Model):
         )
 
     def __str__(self):
-        return constants.RECIPE_IN_SHOPPING_CART.format(
-            self.recipe[:constants.TEXT_LENGTH],
-            self.user[:constants.TEXT_LENGTH]
-        )
+        return constants.RECIPE_IN_SHOPPING_CART.format(self.recipe, self.user)
 
 
 class Follow(models.Model):
@@ -299,7 +293,4 @@ class Follow(models.Model):
         )
 
     def __str__(self):
-        return constants.FOLLOWS.format(
-            self.user[:constants.TEXT_LENGTH],
-            self.author[:constants.TEXT_LENGTH]
-        )
+        return constants.FOLLOWS.format(self.user, self.author)
